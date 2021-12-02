@@ -1,6 +1,7 @@
 package day01
 
 import (
+	_ "embed"
 	"fmt"
 	"testing"
 
@@ -17,7 +18,7 @@ func TestPart1(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := data.ToIntSlice(data.Parse())
+		input := data.ToIntSlice(input)
 		fmt.Println(Part1(input))
 	})
 }
@@ -31,7 +32,7 @@ func TestPart2(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := data.ToIntSlice(data.Parse())
+		input := data.ToIntSlice(input)
 		fmt.Println(Part2(input))
 	})
 }

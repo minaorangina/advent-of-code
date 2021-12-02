@@ -1,6 +1,12 @@
 package day01
 
-import "fmt"
+import (
+	_ "embed"
+	"fmt"
+)
+
+//go:embed input.txt
+var input []byte
 
 func Part1(input []int) int {
 	var count int

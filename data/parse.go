@@ -2,25 +2,22 @@ package data
 
 import (
 	"log"
-	"os"
 	"strconv"
-	"strings"
 )
 
-func Parse() []string {
-	bytes, err := os.ReadFile("input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return strings.Split(string(bytes), "\n")
-}
-
-func ToIntSlice(input []string) []int {
+func ToIntSlice(input []byte) []int {
 	var output []int
 
-	for _, v := range input {
-		num, err := strconv.Atoi(v)
+	var cursor int
+	for i, v := range input {
+		if v != '\n' {
+			continue
+		}
+
+		numAsBytes := input[cursor : i-1]
+		cursor = i + 1
+
+		num, err := strconv.Atoi(string(numAsBytes))
 		if err != nil {
 			log.Fatal(err)
 		}
