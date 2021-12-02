@@ -1,18 +1,34 @@
 package day02
 
 import (
+	"fmt"
 	"testing"
 )
 
 func TestPart1(t *testing.T) {
-	testInput := `forward 5
-down 5
-forward 8
-up 3
-down 8
-forward 2`
+	t.Run("test case", func(t *testing.T) {
+		testInput := []byte(`forward 5
+		down 5
+		forward 8
+		up 3
+		down 8
+		forward 2`)
 
-	if Part1([]byte(testInput)) != 150 {
-		t.Fatal()
-	}
+		res, err := Part1(testInput)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if res != 150 {
+			t.Fatalf("wanted 150, got %d", res)
+		}
+	})
+
+	t.Run("real thing", func(t *testing.T) {
+		res, err := Part1(input)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fmt.Printf("Day 2, part 1: %d", res)
+	})
 }
