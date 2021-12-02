@@ -3,14 +3,10 @@ package day02
 import (
 	"bufio"
 	"bytes"
-	_ "embed"
 	"fmt"
 	"strconv"
 	"strings"
 )
-
-//go:embed input.txt
-var input []byte
 
 func Part1(input []byte) (int, error) {
 	scanner := bufio.NewScanner(bytes.NewReader(input))

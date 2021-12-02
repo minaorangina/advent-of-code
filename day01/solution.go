@@ -1,13 +1,5 @@
 package day01
 
-import (
-	_ "embed"
-	"fmt"
-)
-
-//go:embed input.txt
-var input []byte
-
 func Part1(input []int) int {
 	var count int
 
@@ -39,7 +31,6 @@ func Part2(input []int) int {
 		sumPrevWindow += input[i-1] + input[i] + input[i+1]
 
 		if sumWindow > sumPrevWindow {
-			fmt.Println("increased")
 			count++
 		}
 	}

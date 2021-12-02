@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/minaorangina/advent-of-code-2021/data"
+	"github.com/minaorangina/advent-of-code-2021/parse"
 )
+
+//go:embed input.txt
+var input []byte
 
 func TestPart1(t *testing.T) {
 	testInput := []int{199, 200, 208, 210, 200, 207, 240, 269, 260, 263}
@@ -18,7 +21,7 @@ func TestPart1(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := data.ToIntSlice(input)
+		input := parse.ToIntSlice(input)
 		fmt.Println(Part1(input))
 	})
 }
@@ -32,7 +35,7 @@ func TestPart2(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := data.ToIntSlice(input)
+		input := parse.ToIntSlice(input)
 		fmt.Println(Part2(input))
 	})
 }
