@@ -32,7 +32,8 @@ func TestPart2(t *testing.T) {
 	if got != 230 {
 		t.Fatalf("got %d, want 230", got)
 	}
+
 	t.Run("real thing", func(t *testing.T) {
-		fmt.Println(Part1(parse.ToStringSlice(input)))
+		fmt.Println(Part2(parse.ToStringSlice(input)))
 	})
 }

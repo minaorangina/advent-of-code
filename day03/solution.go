@@ -37,86 +37,53 @@ func Part1(rows []string) int {
 	return int(gammaRate * epsilonRate)
 }
 
-const (
-	least = iota
-	most
-)
-
 func Part2(rows []string) int {
 	numColumns := len(rows[0])
+	oneTracker, rowTracker := make([]int, numColumns), make([]int, numColumns)
+	var oxygen, co2 uint
 
-	var rowsA, rowsB []string
+	// the number of rows changes as we move to the right
+	// need to go column by column
+	check := []int{}
 
-	rowsA = whittleDown(rows, 0, most)
-	rowsB = whittleDown(rows, 0, least)
-	fmt.Println("????", rowsA, rowsB)
+	for col := 0; col < numColumns; col++ {
+		var ones, zeros []string
 
-	var oxygenRating, co2Rating uint16
-	for i, v := range rowsA[0] {
-		binaryIdx := numColumns - i
-
-		numA, err := strconv.Atoi(string(v))
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("huh?", string(rowsB[0][1]))
-		numB, err := strconv.Atoi(string(rowsB[0][i]))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Println("%%%%%", numA, numB)
-		oxygenRating += uint16(math.Pow(2, float64(binaryIdx)-1) * float64(numA))
-		co2Rating += uint16(math.Pow(2, float64(binaryIdx)-1) * float64(numB))
-	}
-
-	fmt.Println("oxy", oxygenRating, "co2", co2Rating)
-	return int(oxygenRating * co2Rating)
-}
-
-func getMostCommon(oneCount, rowLength float64) byte {
-	if oneCount >= rowLength/2 {
-		return '1'
-	}
-	return '0'
-}
-
-func whittleDown(rows []string, idx int, searchFor int) []string {
-	if len(rows) == 1 {
-		return rows
-	}
-	oneTracker := 0
-	// fmt.Printf("\nlen rows: %d\n", len(rows))
-
-	for _, toLookAt := range rows {
-		num, err := strconv.Atoi(string(toLookAt[idx]))
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		oneTracker += num
-
-	}
-	// fmt.Printf("col %d we got %d 1s\n", idx, oneTracker)
-
-	var winners []string
-	mostCommon := getMostCommon(float64(oneTracker), float64((len(rows))))
-
-	if searchFor == most {
-		for _, r := range rows {
-			if r[idx] == mostCommon {
-				winners = append(winners, r)
+		for r := 0; r < len(rows); r++ {
+			char := rows[r][col]
+			num, err := strconv.Atoi(string(char))
+			if err != nil {
+				log.Fatal(err)
+			}
+			oneTracker[col] += num
+			if num == 1 {
+				ones = append(ones, rows[r])
+			} else {
+				zeros = append(zeros, rows[r])
 			}
 		}
-	}
+		rowTracker[col] += len(rows)
 
-	if searchFor == least {
-		for _, r := range rows {
-			if r[idx] != mostCommon {
-				winners = append(winners, r)
-			}
+		// figure out the most populous here
+		midpoint := float64(len(rows)) / 2
+		binaryIdx := numColumns - col
+
+		fmt.Printf("mid: %2f, col: %d, num 1s: %d\n", midpoint, col, oneTracker[col])
+
+		if float64(oneTracker[col]) >= midpoint {
+			check = append(check, 1)
+			oxygen += uint(math.Pow(2, float64(binaryIdx)-1))
+			rows = ones
+		} else if float64(rowTracker[col]-oneTracker[col]) >= midpoint {
+			check = append(check, 0)
+			co2 += uint(math.Pow(2, float64(binaryIdx)-1))
+			rows = zeros
 		}
 	}
 
-	return whittleDown(winners, idx+1, searchFor)
+	fmt.Println("onet", oneTracker, "rowt", rowTracker)
+
+	fmt.Printf("check: %v\no2: %d %12b, c02: %d %12b", check, oxygen, oxygen, co2, co2)
+
+	return int(oxygen * co2)
 }
