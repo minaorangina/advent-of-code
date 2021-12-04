@@ -1,6 +1,7 @@
 package day04
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -8,89 +9,101 @@ import (
 
 func Part1(input []byte) int {
 	game := bingo{}
-	game.init(input)
+	game.parse(input)
 	return game.play()
 }
-
-/*
-need a way to determine a horizontal or vertical row of numbers
-
-win state:
-for a board, 5 numbers with the same horizontal or vertical coordinate
-
-identifier per row/column, per board
-- pull number, update row/column identifiers per board
-- scan through and look for 5
-
-sum of all unmarked numbers
-- calculate at the beginning, decrement as we go
-
-finding a number on the board
-
-
-
-*/
 
 type position struct {
 	row, column int
 }
 
 type board struct {
-	positions map[int]position
-	unmarked  int
-	called    map[string]int
+	positions  map[int]position
+	unmarked   int
+	winTracker map[string]int
+}
+
+func (b board) won() bool {
+	for where, markedCount := range b.winTracker {
+		if markedCount == 5 {
+			fmt.Printf("win detected in %s\n", where)
+			return true
+		}
+	}
+	return false
+}
+
+func (b board) score(lastDrawn int) int {
+	score := b.unmarked * lastDrawn
+	fmt.Println(b.unmarked, lastDrawn, score)
+	return b.unmarked * lastDrawn
 }
 
 type bingo struct {
-	boards []board
+	boards []*board
 	toCall []int
 }
 
-func (b *bingo) init(data []byte) {
-	// parse
-	b.parse(data)
-	// setup positions for each board, calculate unmarked
-}
-
 func (b *bingo) play() int {
-	// take next number
-	// for each board, find position, update called and decrement unmarked
-	// break on win condition
+	for _, drawn := range b.toCall {
+		fmt.Println("have drawn", drawn)
 
-	// calculate result
+		for i, brd := range b.boards {
+			pos, ok := brd.positions[drawn]
+			if !ok {
+				continue
+			}
+			brd.unmarked -= drawn
+
+			colKey := fmt.Sprintf("col-%d", pos.column)
+			rowKey := fmt.Sprintf("row-%d", pos.row)
+			brd.winTracker[colKey]++
+			brd.winTracker[rowKey]++
+
+			fmt.Printf("board num: %d\n\t%+v\n", i, brd.winTracker)
+
+			if brd.won() {
+				fmt.Printf("win for board %d\n", i)
+				return brd.score(drawn)
+			}
+
+		}
+	}
+
 	return 0
 }
 
 func (b *bingo) parse(input []byte) {
 	d := strings.Split(string(input), "\n\n")
+	callingNums := strings.Split(d[0], ",")
 
-	for _, c := range d[0] {
-		if string(c) == "," {
-			continue
-		}
-		num, err := strconv.Atoi(string(c))
+	for _, char := range callingNums {
+		num, err := strconv.Atoi(char)
 		if err != nil {
 			log.Fatal(err)
 		}
 		b.toCall = append(b.toCall, num)
 	}
 
+	fmt.Println(b.toCall)
+
 	for boardNum, brd := range d[1:] {
-		b.boards = append(b.boards, board{
-			positions: map[int]position{},
-			called:    map[string]int{},
+		b.boards = append(b.boards, &board{
+			positions:  map[int]position{},
+			winTracker: map[string]int{},
 		})
 
+		var unmarked int
 		rows := strings.Split(brd, "\n")
 
 		for rowIdx, r := range rows {
 			if r == "" {
 				continue
 			}
-			asSlice := strings.Fields(r)
 
-			var unmarked int
-			for colIdx, c := range asSlice {
+			numbers := strings.Fields(r)
+
+			for colIdx, c := range numbers {
 				n, err := strconv.Atoi(c)
 				if err != nil {
 					log.Fatal(err)
@@ -101,8 +114,9 @@ func (b *bingo) parse(input []byte) {
 
 				unmarked += n
 			}
-
-			b.boards[boardNum].unmarked = unmarked
 		}
+
+		b.boards[boardNum].unmarked = unmarked
 	}
+	fmt.Printf("%+v\n", len(b.boards[0].positions))
 }
