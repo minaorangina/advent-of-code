@@ -18,9 +18,10 @@ type position struct {
 }
 
 type board struct {
-	positions  map[int]position
-	unmarked   int
-	winTracker map[string]int
+	positions           map[int]position
+	unmarked            int
+	winTracker          map[string]int
+	winningBoardTracker map[int]struct{}
 }
 
 func (b board) won() bool {
