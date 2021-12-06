@@ -13,6 +13,11 @@ func Part1(input []byte) int {
 	return game.play()
 }
 
+func Part2(input []byte) int {
+	// TODO
+	return 0
+}
+
 type position struct {
 	row, column int
 }
@@ -25,9 +30,8 @@ type board struct {
 }
 
 func (b board) won() bool {
-	for where, markedCount := range b.winTracker {
+	for _, markedCount := range b.winTracker {
 		if markedCount == 5 {
-			fmt.Printf("win detected in %s\n", where)
 			return true
 		}
 	}
@@ -35,8 +39,6 @@ func (b board) won() bool {
 }
 
 func (b board) score(lastDrawn int) int {
-	score := b.unmarked * lastDrawn
-	fmt.Println(b.unmarked, lastDrawn, score)
 	return b.unmarked * lastDrawn
 }
 
@@ -47,9 +49,7 @@ type bingo struct {
 
 func (b *bingo) play() int {
 	for _, drawn := range b.toCall {
-		fmt.Println("have drawn", drawn)
-
-		for i, brd := range b.boards {
+		for _, brd := range b.boards {
 			pos, ok := brd.positions[drawn]
 			if !ok {
 				continue
@@ -61,10 +61,7 @@ func (b *bingo) play() int {
 			brd.winTracker[colKey]++
 			brd.winTracker[rowKey]++
 
-			fmt.Printf("board num: %d\n\t%+v\n", i, brd.winTracker)
-
 			if brd.won() {
-				fmt.Printf("win for board %d\n", i)
 				return brd.score(drawn)
 			}
 
@@ -85,8 +82,6 @@ func (b *bingo) parse(input []byte) {
 		}
 		b.toCall = append(b.toCall, num)
 	}
-
-	fmt.Println(b.toCall)
 
 	for boardNum, brd := range d[1:] {
 		b.boards = append(b.boards, &board{
@@ -119,5 +114,4 @@ func (b *bingo) parse(input []byte) {
 
 		b.boards[boardNum].unmarked = unmarked
 	}
-	fmt.Printf("%+v\n", len(b.boards[0].positions))
 }
