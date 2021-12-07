@@ -2,7 +2,10 @@ package day06
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
+
+	"github.com/minaorangina/advent-of-code-2021/parse"
 )
 
 var (
@@ -12,7 +15,7 @@ var (
 	input []byte
 )
 
-func TestPart1(t *testing.T) {
+func TestSolution(t *testing.T) {
 	tt := []struct {
 		days, want int
 	}{
@@ -30,13 +33,14 @@ func TestPart1(t *testing.T) {
 		}}
 
 	for _, tc := range tt {
-		got := Part1(testInput, tc.days)
+		got := Solution(parse.ToIntSlice(testInput), tc.days)
 		if got != tc.want {
 			t.Errorf("got %d, want %d", got, tc.want)
 		}
 	}
 
-	// t.Run("real thing", func(t *testing.T) {
-	// 	fmt.Println(Part1(input, 80))
-	// })
+	t.Run("real thing", func(t *testing.T) {
+		fmt.Println(Solution(parse.ToIntSlice(input), 80))
+		fmt.Println(Solution(parse.ToIntSlice(input), 256))
+	})
 }
