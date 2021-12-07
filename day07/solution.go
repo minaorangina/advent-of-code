@@ -1,55 +1,58 @@
 package day07
 
 import (
-	"log"
 	"math"
-	"strconv"
-	"strings"
+	"sort"
 )
 
-func Part1(inputB []byte) int {
-	asString := strings.Split((string(inputB)), ",")
+func Part1(input []int) int {
+	sort.Slice(input, func(i, j int) bool {
+		return input[i] > input[j]
+	})
 
-	var input []int
-	for _, c := range asString {
-		n, err := strconv.Atoi(c)
-		if err != nil {
-			log.Fatal(err)
-		}
-		input = append(input, n)
-	}
+	max := input[0]
 
-	cost := map[int]struct{}{}
-	for _, v := range input {
-		cost[v] = struct{}{}
-	}
-
-	smallest := math.Inf(1)
-	for position := range cost {
+	smallestCost := math.Inf(1)
+	for position := 0; position <= max; position++ {
 		var c float64
 		for _, v := range input {
 			diff := math.Abs(float64(v - position))
 			c += diff
 		}
-		if c < smallest {
-			smallest = c
+		if c < smallestCost {
+			smallestCost = c
 		}
 	}
 
-	return int(smallest)
+	return int(smallestCost)
 }
 
-func Part2(inputB []byte) int {
-	asString := strings.Split((string(inputB)), ",")
+func Part2(input []int) int {
+	sort.Slice(input, func(i, j int) bool {
+		return input[i] > input[j]
+	})
 
-	var input []int
-	for _, c := range asString {
-		n, err := strconv.Atoi(c)
-		if err != nil {
-			log.Fatal(err)
+	max := input[0]
+
+	smallestCost := math.Inf(1)
+	for position := 0; position <= max; position++ {
+		var c float64
+		for _, v := range input {
+			diff := math.Abs(float64(v - position))
+			c += getScore(diff)
 		}
-		input = append(input, n)
+		if c < smallestCost {
+			smallestCost = c
+		}
 	}
 
-	return 0
+	return int(smallestCost)
+}
+
+func getScore(diff float64) float64 {
+	var score int
+	for i := 1; i <= int(diff); i++ {
+		score += i
+	}
+	return float64((score))
 }
