@@ -3,9 +3,10 @@ package parse
 import (
 	"log"
 	"strconv"
+	"strings"
 )
 
-func ToIntSlice(input []byte) []int {
+func ColumnToIntSlice(input []byte) []int {
 	var output []int
 
 	var cursor int
@@ -23,6 +24,20 @@ func ToIntSlice(input []byte) []int {
 	}
 
 	return output
+}
+
+func ToIntSlice(inputB []byte) []int {
+	asString := strings.Split((string(inputB)), ",")
+
+	var input []int
+	for _, c := range asString {
+		n, err := strconv.Atoi(c)
+		if err != nil {
+			log.Fatal(err)
+		}
+		input = append(input, n)
+	}
+	return input
 }
 
 func ToStringSlice(input []byte) []string {

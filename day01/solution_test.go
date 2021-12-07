@@ -21,7 +21,7 @@ func TestPart1(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := parse.ToIntSlice(input)
+		input := parse.ColumnToIntSlice(input)
 		fmt.Println(Part1(input))
 	})
 }
@@ -35,7 +35,7 @@ func TestPart2(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		input := parse.ToIntSlice(input)
+		input := parse.ColumnToIntSlice(input)
 		fmt.Println(Part2(input))
 	})
 }
