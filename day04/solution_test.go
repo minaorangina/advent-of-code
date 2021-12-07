@@ -14,13 +14,24 @@ var (
 )
 
 func TestPart1(t *testing.T) {
-	got := Part1(testInput)
+	got := Solution(testInput, true)
 
 	if got != 4512 {
 		t.Errorf("got %d, want 4512", got)
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		fmt.Println(Part1(input))
+		fmt.Println(Solution(input, true))
+	})
+}
+func TestPart2(t *testing.T) {
+	got := Solution(testInput, false)
+
+	if got != 4512 {
+		t.Errorf("got %d, want 4512", got)
+	}
+
+	t.Run("real thing", func(t *testing.T) {
+		fmt.Println(Solution(input, false))
 	})
 }

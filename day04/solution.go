@@ -7,15 +7,10 @@ import (
 	"strings"
 )
 
-func Part1(input []byte) int {
+func Solution(input []byte, isPart1 bool) int {
 	game := bingo{}
 	game.parse(input)
-	return game.play()
-}
-
-func Part2(input []byte) int {
-	// TODO
-	return 0
+	return game.play(isPart1)
 }
 
 type position struct {
@@ -26,13 +21,25 @@ type board struct {
 	positions           map[int]position
 	unmarked            int
 	winTracker          map[string]int
-	winningBoardTracker map[int]struct{}
+	winningBoardTracker int
 }
 
 func (b board) won() bool {
 	for _, markedCount := range b.winTracker {
 		if markedCount == 5 {
 			return true
+		}
+	}
+	return false
+}
+
+func (b board) wonPart2(numBoards int) bool {
+	for _, markedCount := range b.winTracker {
+		if markedCount == 5 {
+			b.winningBoardTracker++
+			if b.winningBoardTracker == numBoards {
+				return true
+			}
 		}
 	}
 	return false
@@ -47,7 +54,7 @@ type bingo struct {
 	toCall []int
 }
 
-func (b *bingo) play() int {
+func (b *bingo) play(isPart1 bool) int {
 	for _, drawn := range b.toCall {
 		for _, brd := range b.boards {
 			pos, ok := brd.positions[drawn]
@@ -61,7 +68,11 @@ func (b *bingo) play() int {
 			brd.winTracker[colKey]++
 			brd.winTracker[rowKey]++
 
-			if brd.won() {
+			if isPart1 {
+				if brd.won() {
+					return brd.score(drawn)
+				}
+			} else if brd.wonPart2(len(b.boards)) {
 				return brd.score(drawn)
 			}
 
