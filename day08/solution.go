@@ -45,56 +45,65 @@ func Part2(input []byte) int {
 		outputVals := strings.Fields(parts[1])
 
 		// segmentCount: digit
-		knownEncodings := map[int]int{
+		knownLengths := map[int]int{
 			2: 1,
 			3: 7,
 			4: 4,
 			7: 8,
 		}
 
+		// done when len == 9
 		encodingToDigit := map[string]int{}
+		digitToEncoding := map[int]string{}
 
-		positions := map[string]*int{
-			"top":         nil,
-			"upperleft":   nil,
-			"upperright":  nil,
-			"middle":      nil,
-			"bottomleft":  nil,
-			"bottomright": nil,
-			"bottom":      nil,
+		positions := map[string]string{
+			"top":         "",
+			"upperleft":   "",
+			"upperright":  "",
+			"middle":      "",
+			"bottomleft":  "",
+			"bottomright": "",
+			"bottom":      "",
+		}
+
+		possiblePositions := map[string][]string{
+			"top":         {"a", "b", "c", "d", "e", "f", "g"},
+			"upperleft":   {"a", "b", "c", "d", "e", "f", "g"},
+			"upperright":  {"a", "b", "c", "d", "e", "f", "g"},
+			"middle":      {"a", "b", "c", "d", "e", "f", "g"},
+			"bottomleft":  {"a", "b", "c", "d", "e", "f", "g"},
+			"bottomright": {"a", "b", "c", "d", "e", "f", "g"},
+			"bottom":      {"a", "b", "c", "d", "e", "f", "g"},
 		}
 
 		_ = positions
+		_ = possiblePositions
 		_ = outputVals
 
 		for _, encoding := range encodingRules {
-			// identify 1 (2 chars, upper right, lower right, no ordering)
-			digit, ok := knownEncodings[len(encoding)]
+			// identify 1, 4, 7 and 8
+			digit, ok := knownLengths[len(encoding)]
 			if ok {
-				canonicalEncoding := []rune(encoding)
-				sort.Slice(canonicalEncoding, func(a, b int) bool {
-					return canonicalEncoding[a] < canonicalEncoding[b]
-				})
-
-				encodingToDigit[string(canonicalEncoding)] = digit
+				canon := canonicalEncoding(encoding)
+				encodingToDigit[canon] = digit
+				digitToEncoding[digit] = canon
 			}
-
-			// identify 7 -> find spare char (top)
-
-			// identify 4 -> find spare 2 chars (middle, upper left, no ordering)
-
-			// identify 8 -> find spare 2 chars (bottom, lower left, no ordering)
-
-			// unknowns
-
-			// identify 9 -> 4 + top char + find spare (bottom)
-
 		}
+
+		//
 
 		fmt.Println("iudgfiusdh", encodingToDigit)
 	}
 
 	return count
+}
+
+func canonicalEncoding(raw string) string {
+	canon := []rune(raw)
+	sort.Slice(canon, func(a, b int) bool {
+		return canon[a] < canon[b]
+	})
+	return string(canon)
 }
 
 func uniqueLength(l int) bool {
