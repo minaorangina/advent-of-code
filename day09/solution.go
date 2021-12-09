@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"sync"
 )
@@ -81,7 +82,7 @@ func Part2(input []byte) int {
 		outer = append(outer, inner)
 	}
 
-	total := 1
+	var basinSizes []int
 	for i, inner := range outer {
 		for j, v := range inner {
 			// left inner[j-1]
@@ -119,12 +120,13 @@ func Part2(input []byte) int {
 				mu:   &sync.Mutex{},
 			}
 			basinSize := find(outer, c, [2]int{i, j})
-			if basinSize > 0 {
-				total *= basinSize
-			}
+			basinSizes = append(basinSizes, basinSize)
 		}
 	}
-	return total
+	sort.Ints(basinSizes)
+	sort.Sort(sort.Reverse(sort.IntSlice(basinSizes)))
+
+	return basinSizes[0] * basinSizes[1] * basinSizes[2]
 }
 
 func find(matrix [][]int, c cache, start coord) int {
@@ -149,7 +151,6 @@ func find(matrix [][]int, c cache, start coord) int {
 	count += find(matrix, c, start.down())
 	count += find(matrix, c, start.left())
 	count += find(matrix, c, start.right())
-	fmt.Printf("count for %s: %d\n", start.String(), start.value(matrix))
 	return count
 }
 

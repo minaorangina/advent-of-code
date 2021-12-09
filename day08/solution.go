@@ -3,6 +3,7 @@ package day08
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 )
@@ -34,7 +35,6 @@ func Part1(input []byte) int {
 }
 
 func Part2(input []byte) int {
-
 	scanner := bufio.NewScanner(strings.NewReader(string(input)))
 	var count int
 	for scanner.Scan() {
@@ -44,6 +44,35 @@ func Part2(input []byte) int {
 		encodingRules := strings.Fields(parts[0])
 		outputVals := strings.Fields(parts[1])
 
+		/*****/
+
+		// done when len == 9
+		encodingToDigit := map[string]int{}
+		digitToEncoding := map[int]string{}
+
+		const (
+			top position = iota
+			upperLeft
+			upperRight
+			middle
+			lowerLeft
+			lowerRight
+			bottom
+		)
+
+		positionTracker := map[string][]position{
+			"a": {0, 1, 2, 3, 4, 5, 6},
+			"b": {0, 1, 2, 3, 4, 5, 6},
+			"c": {0, 1, 2, 3, 4, 5, 6},
+			"d": {0, 1, 2, 3, 4, 5, 6},
+			"e": {0, 1, 2, 3, 4, 5, 6},
+			"f": {0, 1, 2, 3, 4, 5, 6},
+			"g": {0, 1, 2, 3, 4, 5, 6},
+		}
+
+		_ = positionTracker
+		_ = outputVals
+
 		// segmentCount: digit
 		knownLengths := map[int]int{
 			2: 1,
@@ -51,34 +80,6 @@ func Part2(input []byte) int {
 			4: 4,
 			7: 8,
 		}
-
-		// done when len == 9
-		encodingToDigit := map[string]int{}
-		digitToEncoding := map[int]string{}
-
-		positions := map[string]string{
-			"top":         "",
-			"upperleft":   "",
-			"upperright":  "",
-			"middle":      "",
-			"bottomleft":  "",
-			"bottomright": "",
-			"bottom":      "",
-		}
-
-		possiblePositions := map[string][]string{
-			"top":         {"a", "b", "c", "d", "e", "f", "g"},
-			"upperleft":   {"a", "b", "c", "d", "e", "f", "g"},
-			"upperright":  {"a", "b", "c", "d", "e", "f", "g"},
-			"middle":      {"a", "b", "c", "d", "e", "f", "g"},
-			"bottomleft":  {"a", "b", "c", "d", "e", "f", "g"},
-			"bottomright": {"a", "b", "c", "d", "e", "f", "g"},
-			"bottom":      {"a", "b", "c", "d", "e", "f", "g"},
-		}
-
-		_ = positions
-		_ = possiblePositions
-		_ = outputVals
 
 		for _, encoding := range encodingRules {
 			// identify 1, 4, 7 and 8
@@ -90,12 +91,44 @@ func Part2(input []byte) int {
 			}
 		}
 
-		//
+		// work out top from 1 and 7
+		fmt.Printf("1 %s, 7 %s\n", digitToEncoding[1], digitToEncoding[7])
+		diff := getSetDifference(digitToEncoding[1], digitToEncoding[7])
+		if len(diff) != 1 {
+			log.Fatalf("expected set difference of 1, got %d: %v", len(diff), diff)
+		}
+		positionTracker[string(diff[0])] = []position{top}
 
-		fmt.Println("iudgfiusdh", encodingToDigit)
+		// work out
+
+		fmt.Println("positionTracker", positionTracker)
+
+		// goal, get the correct position for top
+
 	}
 
 	return count
+}
+
+func getSetDifference(a, b string) string {
+	mb := make(map[string]struct{}, len(b))
+
+	for _, x := range b {
+		mb[string(x)] = struct{}{}
+	}
+	var diff string
+	for _, x := range a {
+		if _, found := mb[string(x)]; !found {
+			diff += string(x)
+		}
+	}
+	return diff
+}
+
+func stringSetToSlice(set map[string]struct{}) []rune {
+	out := []rune{}
+
+	return out
 }
 
 func canonicalEncoding(raw string) string {
@@ -114,6 +147,24 @@ func uniqueLength(l int) bool {
 	return false
 }
 
-// 7 (1 plus 1xline)
-// 4 (1 plus 2xline)
-// 8 (all lines)
+type position int
+
+func (p position) String() string {
+	switch p {
+	case 0:
+		return "top"
+	case 1:
+		return "upper left"
+	case 2:
+		return "upper right"
+	case 3:
+		return "middle"
+	case 4:
+		return "bottom left"
+	case 5:
+		return "bottom left"
+	case 6:
+		return "bottom"
+	}
+	return ""
+}

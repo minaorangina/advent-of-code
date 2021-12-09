@@ -30,7 +30,6 @@ func TestPart2(t *testing.T) {
 	}
 
 	t.Run("real thing", func(t *testing.T) {
-		t.Skip()
 		fmt.Println(Part2(input))
 	})
 }
