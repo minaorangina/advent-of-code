@@ -9,7 +9,6 @@ import (
 )
 
 func Part1(input []byte) int {
-
 	scanner := bufio.NewScanner(strings.NewReader(string(input)))
 	var count int
 	for scanner.Scan() {
@@ -23,14 +22,6 @@ func Part1(input []byte) int {
 			}
 		}
 	}
-
-	segmentCounts := map[int]int{
-		1: 2,
-		4: 4,
-		7: 3,
-		8: 7,
-	}
-	_ = segmentCounts
 	return count
 }
 
@@ -62,13 +53,15 @@ func Part2(input []byte) int {
 
 		positionTracker := map[string][]position{
 			"a": {0, 1, 2, 3, 4, 5, 6},
-			"b": {0, 1, 2, 3, 4, 5, 6},
-			"c": {0, 1, 2, 3, 4, 5, 6},
-			"d": {0, 1, 2, 3, 4, 5, 6},
-			"e": {0, 1, 2, 3, 4, 5, 6},
+			"b": {0, 1, 2, 3, 4, 5, 6}, //2,5
+			"c": {0, 1, 2, 3, 4, 5, 6}, //1,3
+			"d": {0, 1, 2, 3, 4, 5, 6}, //0
+			"e": {0, 1, 2, 3, 4, 5, 6}, //2,5
 			"f": {0, 1, 2, 3, 4, 5, 6},
-			"g": {0, 1, 2, 3, 4, 5, 6},
+			"g": {0, 1, 2, 3, 4, 5, 6}, //1,3
 		}
+
+		positionToLetter := map[position]string{}
 
 		_ = positionTracker
 		_ = outputVals
@@ -97,32 +90,48 @@ func Part2(input []byte) int {
 		if len(diff) != 1 {
 			log.Fatalf("expected set difference of 1, got %d: %v", len(diff), diff)
 		}
-		positionTracker[string(diff[0])] = []position{top}
+		positionTracker[diff[0]] = []position{top}
+		positionToLetter[top] = diff[0]
 
 		// work out
 
-		fmt.Println("positionTracker", positionTracker)
+		// find 9 (combo of 4 and top)
+		partial := []rune(digitToEncoding[4] + positionToLetter[top])
+		sort.Slice(partial, func(a, b int) bool { return partial[a] < partial[b] })
 
-		// goal, get the correct position for top
-
+		fmt.Println(string(partial), "????????")
 	}
 
 	return count
 }
 
-func getSetDifference(a, b string) string {
+func getSetDifference(a, b string) []string {
 	mb := make(map[string]struct{}, len(b))
-
+	// a, but not b
 	for _, x := range b {
 		mb[string(x)] = struct{}{}
 	}
-	var diff string
+	notIn := []string{}
 	for _, x := range a {
 		if _, found := mb[string(x)]; !found {
-			diff += string(x)
+			notIn = append(notIn, string(x))
 		}
 	}
-	return diff
+
+	ma := make(map[string]struct{}, len(a))
+	// b, but not a
+	for _, x := range a {
+		ma[string(x)] = struct{}{}
+	}
+
+	for _, x := range b {
+		if _, found := ma[string(x)]; !found {
+			notIn = append(notIn, string(x))
+
+		}
+	}
+
+	return notIn
 }
 
 func stringSetToSlice(set map[string]struct{}) []rune {
