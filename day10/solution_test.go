@@ -2,13 +2,15 @@ package day10
 
 import (
 	_ "embed"
+	"fmt"
 	"testing"
 )
 
 var (
 	//go:embed testinput.txt
 	testInput []byte
-	input     []byte
+	//go:embed input.txt
+	input []byte
 )
 
 func TestPart1(t *testing.T) {
@@ -16,4 +18,8 @@ func TestPart1(t *testing.T) {
 	if got != 26397 {
 		t.Fatalf("got %d, want 26397", got)
 	}
+
+	t.Run("real thing", func(t *testing.T) {
+		fmt.Println(Part1(input))
+	})
 }
