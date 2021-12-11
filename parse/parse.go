@@ -26,6 +26,7 @@ func ColumnToIntSlice(input []byte) []int {
 	return output
 }
 
+// ToIntSlice converts a comma-separated string of numbers into a slice of integers
 func ToIntSlice(inputB []byte) []int {
 	asString := strings.Split((string(inputB)), ",")
 
