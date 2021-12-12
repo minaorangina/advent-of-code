@@ -91,6 +91,72 @@ func Part1(input []byte, steps int) int {
 	return flashes
 }
 
+func Part2(input []byte, steps int) int {
+	scanner := bufio.NewScanner(bytes.NewReader(input))
+
+	var m matrix
+	for scanner.Scan() {
+		l := scanner.Text()
+		n := strings.Split(l, "")
+
+		var line []int
+		for _, v := range n {
+			num, err := strconv.Atoi(v)
+			if err != nil {
+				log.Fatal(err)
+			}
+			line = append(line, num)
+		}
+
+		m = append(m, line)
+	}
+
+	for n := 0; n < steps; n++ {
+		var flashes int
+
+		for i, row := range m {
+			for j := range row {
+				m[i][j]++
+			}
+		}
+
+		var queue []cell
+
+		for i, row := range m {
+			for j := range row {
+				if row[j] > 9 {
+					queue = append(queue, newCell(i, j))
+					m[i][j] = 0
+					flashes++
+				}
+			}
+		}
+
+		for len(queue) > 0 {
+			c := queue[0]
+			queue = queue[1:]
+			neighbours := getNeighbours(m, c)
+
+			for _, n := range neighbours {
+				x, y := n[0], n[1]
+				if m[x][y] != 0 {
+					m[x][y]++
+					if m[x][y] > 9 {
+						m[x][y] = 0
+						flashes++
+						queue = append(queue, newCell(x, y))
+					}
+				}
+			}
+		}
+
+		if flashes == len(m)*len(m[0]) {
+			return n + 1
+		}
+	}
+	return 0
+}
+
 func getNeighbours(matrix [][]int, centre [2]int) []cell {
 	var neighbours []cell
 	deltas := [][2]int{

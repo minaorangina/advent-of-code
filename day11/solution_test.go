@@ -3,6 +3,7 @@ package day11
 import (
 	_ "embed"
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ var (
 	input []byte
 )
 
-func TestPart1(t *testing.T) {
+func TestSolution(t *testing.T) {
 	tt := []struct {
 		steps, want int
 	}{
@@ -30,5 +31,9 @@ func TestPart1(t *testing.T) {
 
 	t.Run("real thing", func(t *testing.T) {
 		fmt.Println(Part1(input, 100))
+	})
+
+	t.Run("part 2", func(t *testing.T) {
+		fmt.Println(Part2(input, math.MaxInt))
 	})
 }
