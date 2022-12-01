@@ -21,3 +21,11 @@ func TestPart1(t *testing.T) {
 
 	fmt.Println(Part1(bytes.NewReader(input)))
 }
+
+func TestPart2(t *testing.T) {
+	if res := Part2(bytes.NewReader(testInput)); res != 45000 {
+		t.Errorf("got %d, want 45000", res)
+	}
+
+	fmt.Println(Part2(bytes.NewReader(input)))
+}
