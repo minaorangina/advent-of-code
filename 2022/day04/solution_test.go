@@ -19,3 +19,10 @@ func TestPart1(t *testing.T) {
 	}
 	fmt.Println(Part1(bytes.NewReader(input)))
 }
+
+func TestPart2(t *testing.T) {
+	if res := Part2(bytes.NewReader(testinput)); res != 4 {
+		t.Errorf("want 4 got %d", res)
+	}
+	fmt.Println(Part2(bytes.NewReader(input)))
+}
