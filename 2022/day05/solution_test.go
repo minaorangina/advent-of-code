@@ -13,13 +13,13 @@ var testinput []byte
 var input []byte
 
 func TestPart1(t *testing.T) {
-	if res := Part1(testinput); res != "CMZ" {
+	if res := Solution(testinput, fromBottom); res != "CMZ" {
 		t.Errorf("got %s, want CMZ", res)
 	}
-	fmt.Println(Part1(input))
-}
+	if res := Solution(testinput, fromTop); res != "MCD" {
+		t.Errorf("got %s, want MCD", res)
+	}
 
-// TIL
-// - breakout of an inner loop with labels
-// 	 https://stackoverflow.com/questions/51996175/how-to-break-out-of-nested-loops-in-go
-// - create a slice with length
+	fmt.Println(Solution(input, fromBottom))
+	fmt.Println(Solution(input, fromTop))
+}

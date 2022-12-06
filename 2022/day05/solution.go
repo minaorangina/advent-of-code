@@ -3,14 +3,20 @@ package day05
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-func Part1(b []byte) string {
+type direction int
+
+const (
+	fromTop direction = iota
+	fromBottom
+)
+
+func Solution(b []byte, plonkDirection direction) string {
 	scanner := bufio.NewScanner(bytes.NewReader(b))
 
 	split := regexp.MustCompile(`^(\s+\d+\s+)+$`)
@@ -54,7 +60,7 @@ func Part1(b []byte) string {
 	width := len(matrix[0])
 
 	for _, ins := range instructions {
-		fmt.Println(matrix, ins)
+		// fmt.Println(matrix, ins)
 
 		parts := strings.Split(ins, " ")
 
@@ -73,48 +79,59 @@ func Part1(b []byte) string {
 
 		srcCol, dstCol = srcCol-1, dstCol-1
 
+		// for each crate, collect in a queue
+		toMove := make([]string, numCrates)
+
+		// fmt.Printf("looking for %d crates\n", numCrates)
+
 		for i := 0; i < numCrates; i++ {
-			var dstRow int
-
-			// let's get the coords for where we're going in advance.
-			// peek first element of the dstCol. make more space if necessary
-			if matrix[0][dstCol] != "" {
-				fmt.Println("before new matrix", matrix)
-				newRow := make([]string, width)
-				matrix = append([][]string{newRow}, matrix...)
-				fmt.Println("new matrix", matrix)
-			}
-			// find first empty space in dstCol
-		destination:
 			for row := 0; row < len(matrix); row++ {
-				if matrix[row][dstCol] != "" {
-					break destination
-				}
-				dstRow = row
-			}
-
-			fmt.Println("before move", matrix)
-
-			// pluck topmost crate from srcCol
-		moveCrate:
-			for row := 0; row < len(matrix); row++ {
+				// fmt.Println("locating crate:", matrix[row][srcCol])
 				if matrix[row][srcCol] == "" {
 					continue
 				}
-
-				crate := matrix[row][srcCol]
-				matrix[row][srcCol] = ""
-				fmt.Printf("Crate %s (%d) will move to [%d,%d]\n", crate, []rune(crate), dstRow, dstCol)
-
-				matrix[dstRow][dstCol] = crate
-
-				fmt.Println("after move", matrix)
-				fmt.Println("-----\nblank line\n------")
-				break moveCrate
+				// fmt.Println("continuing with crate:", matrix[row][srcCol])
+				// found a crate, put in the queue
+				idx := i
+				if plonkDirection == fromTop {
+					idx = numCrates - i - 1
+				}
+				toMove[idx] = pluckCrate(matrix, row, srcCol)
+				break
 			}
-
 		}
 
+		// fmt.Println("to move", toMove)
+
+		// peek for empty space(s)
+		spacesReq := numSpacesRequired(matrix, dstCol, numCrates)
+		// fmt.Println("num empty spaces req", spacesReq)
+
+		for i := 0; i < spacesReq; i++ {
+			// fmt.Println("before new matrix", matrix)
+			newRow := make([]string, width)
+			matrix = append([][]string{newRow}, matrix...)
+			// fmt.Println("new matrix", matrix)
+		}
+
+		// move to destination
+		for _, crate := range toMove {
+			for dstRow := range matrix {
+				// if this space is available
+				if matrix[dstRow][dstCol] == "" {
+					// and if the next one isnt, or we're at the end
+					if dstRow == len(matrix)-1 || matrix[dstRow+1][dstCol] != "" {
+
+						// fmt.Printf("about to move %s to [%d,%d] \n", crate, dstRow, dstCol)
+						matrix[dstRow][dstCol] = crate
+						break
+					}
+				}
+			}
+		}
+
+		// fmt.Println("after move", matrix)
+		// fmt.Println("-----\nblank line\n------")
 	}
 
 	answer := make([]string, width)
@@ -122,7 +139,6 @@ func Part1(b []byte) string {
 	for col := 0; col < width; col++ {
 		for row := 0; row < len(matrix); row++ {
 			nabbed := matrix[row][col]
-			fmt.Println(nabbed)
 			if nabbed != "" {
 				answer[col] = nabbed
 				break
@@ -131,4 +147,22 @@ func Part1(b []byte) string {
 	}
 
 	return strings.Join(answer[:], "")
+}
+
+func pluckCrate(matrix [][]string, row, srcCol int) string {
+	crate := matrix[row][srcCol]
+	matrix[row][srcCol] = ""
+	return crate
+}
+
+func numSpacesRequired(matrix [][]string, dstCol, numCrates int) int {
+	spacesReq := 0
+
+	for i := 0; i < numCrates; i++ {
+		if matrix[i][dstCol] != "" { // no space at the inn
+			spacesReq++
+		}
+	}
+
+	return spacesReq
 }
