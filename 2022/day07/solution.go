@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -22,14 +23,19 @@ type command []string
 
 var errNotACommand = errors.New("not a command")
 
-func Part1(r io.Reader) int {
+var (
+	totalDiskSpace float64 = 70000000
+	spaceRequired  float64 = 30000000
+)
+
+func Solution(r io.Reader) (int, int) {
 	scanner := bufio.NewScanner(r)
 
 	var root, currentNode *node
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		fmt.Println(">>>", line)
+		// fmt.Println(">>>", line)
 
 		parts := strings.Split(line, " ")
 
@@ -40,7 +46,6 @@ func Part1(r io.Reader) int {
 
 			// we have a child of the current node
 			child := newNode(currentNode, parts)
-			fmt.Printf("found a child: %s (parent=%s)\n", child.name, child.parent.name)
 
 			currentNode.children[child.name] = child
 		}
@@ -65,36 +70,74 @@ func Part1(r io.Reader) int {
 			}
 		}
 
-		fmt.Println("TREE")
-		printTree(root, 0)
-		fmt.Println("------")
+		// fmt.Println("TREE")
+		// printTree(root, 0)
+		// fmt.Println("------")
 	}
 
 	_, ans := getSize(root)
-	return ans
+
+	smallest := bestNodeToDelete(root, float64(root.size), 0)
+
+	return ans, int(smallest)
 }
 
-// return my file size and the collective file sizes of any children (if <=100k)
+func bestNodeToDelete(n *node, rootSize, num float64) float64 {
+	// we've gone too far
+	if n.entity == "file" {
+		return math.Inf(1)
+	}
+
+	dirSizes := getSizes(n)
+	bestSoFar := math.Inf(1)
+
+	for _, s := range dirSizes {
+		spaceRemaining := totalDiskSpace - rootSize + s
+
+		if spaceRemaining >= spaceRequired && s < bestSoFar {
+			bestSoFar = s
+		}
+	}
+
+	return bestSoFar
+}
+
+func getSizes(n *node) []float64 {
+	if n.entity == "file" {
+		return nil
+	}
+	sizes := []float64{}
+
+	sizes = append(sizes, float64(n.size))
+	fmt.Println("adding", n.name, n.size)
+
+	for _, c := range n.children {
+		s := getSizes(c)
+		sizes = append(sizes, s...)
+	}
+
+	return sizes
+}
 
 func getSize(n *node) (nodeSize int, sumSub100k int) {
 	if n.entity == "file" {
 		return n.size, 0
 	}
 
-	sumSizes, collection := 0, 0
+	dirSize, collection := 0, 0
 	for _, c := range n.children {
 		s, c := getSize(c)
-		sumSizes += s
+		dirSize += s
 		collection += c
 	}
 
-	if sumSizes <= 100000 {
-		collection += sumSizes
+	if dirSize <= 100000 {
+		collection += dirSize
 	}
 
-	fmt.Println("sum", sumSizes, "coll", collection)
+	n.size = dirSize
 
-	return sumSizes, collection
+	return dirSize, collection
 }
 
 func getDest(parts []string) (string, error) {
@@ -147,9 +190,9 @@ func newNode(parent *node, parts []string) *node {
 func printTree(n *node, level int) {
 	msg := fmt.Sprintf("%s- %s", strings.Repeat("  ", level), n.name)
 
-	if n.entity == "file" {
-		msg += fmt.Sprintf(" (file, size=%d)", n.size)
-	} else {
+	msg += fmt.Sprintf(" (%s, size=%d)", n.entity, n.size)
+
+	if n.entity == "dir" {
 		msg += " (dir)"
 		msg += fmt.Sprintf(" [numChildren: %d]", len(n.children))
 	}
