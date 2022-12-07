@@ -65,11 +65,40 @@ func Part1(r io.Reader) int {
 			}
 		}
 
-		fmt.Println("TREE")
-		printTree(root, 0)
-		fmt.Println("------")
+		// fmt.Println("TREE")
+		// printTree(root, 0)
+		// fmt.Println("------")
 	}
 
+	_, ans := getSize(root)
+
+	return ans
+}
+
+func getSize(n *node) (nodeSize int, sumSub10k int) {
+	if n.entity == "file" {
+		return n.size, 0
+	}
+
+	sumSizes, collection := 0, 0
+	for _, c := range n.children {
+		sumSizes, collection = getSize(c)
+	}
+
+	n.size = sumSizes
+	if sumSizes <= 100000 {
+		collection = sumSizes
+	}
+
+	fmt.Println("sum", sumSizes, "coll", collection)
+
+	return sumSizes, collection
+}
+
+func collect(size int) int {
+	if size <= 100000 {
+		return size
+	}
 	return 0
 }
 
@@ -127,9 +156,8 @@ func printTree(n *node, level int) {
 		msg += fmt.Sprintf(" (file, size=%d)", n.size)
 	} else {
 		msg += " (dir)"
+		msg += fmt.Sprintf(" [numChildren: %d]", len(n.children))
 	}
-
-	msg += fmt.Sprintf("[numChildren: %d]", len(n.children))
 
 	fmt.Println(msg)
 
