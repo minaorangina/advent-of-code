@@ -65,41 +65,36 @@ func Part1(r io.Reader) int {
 			}
 		}
 
-		// fmt.Println("TREE")
-		// printTree(root, 0)
-		// fmt.Println("------")
+		fmt.Println("TREE")
+		printTree(root, 0)
+		fmt.Println("------")
 	}
 
 	_, ans := getSize(root)
-
 	return ans
 }
 
-func getSize(n *node) (nodeSize int, sumSub10k int) {
+// return my file size and the collective file sizes of any children (if <=100k)
+
+func getSize(n *node) (nodeSize int, sumSub100k int) {
 	if n.entity == "file" {
 		return n.size, 0
 	}
 
 	sumSizes, collection := 0, 0
 	for _, c := range n.children {
-		sumSizes, collection = getSize(c)
+		s, c := getSize(c)
+		sumSizes += s
+		collection += c
 	}
 
-	n.size = sumSizes
 	if sumSizes <= 100000 {
-		collection = sumSizes
+		collection += sumSizes
 	}
 
 	fmt.Println("sum", sumSizes, "coll", collection)
 
 	return sumSizes, collection
-}
-
-func collect(size int) int {
-	if size <= 100000 {
-		return size
-	}
-	return 0
 }
 
 func getDest(parts []string) (string, error) {
