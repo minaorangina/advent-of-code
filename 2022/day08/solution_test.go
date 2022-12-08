@@ -24,3 +24,12 @@ func TestPart1(t *testing.T) {
 
 	fmt.Println(Part1(bytes.NewReader(input)))
 }
+func TestPart2(t *testing.T) {
+	expected := 8
+
+	if ans := Part2(bytes.NewReader(testinput)); ans != expected {
+		t.Errorf("got %d, want %d", ans, expected)
+	}
+
+	fmt.Println(Part2(bytes.NewReader(input)))
+}

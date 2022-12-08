@@ -2,13 +2,53 @@ package day08
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"log"
 	"strconv"
 )
 
 func Part1(r io.Reader) int {
+	matrix := getMatrix(r)
+
+	perimeter := (len(matrix) * 2) + (len(matrix[0]) * 2) - 4
+	count := perimeter
+
+	for row := 1; row < len(matrix)-1; row++ {
+		for col := 1; col < len(matrix[0])-1; col++ {
+			coords := newCoord(row, col)
+
+			if visibleAlongRow(matrix, coords, row) ||
+				visibleDownColumn(matrix, coords, col) {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
+func Part2(r io.Reader) int {
+	matrix := getMatrix(r)
+
+	bestScore := 0
+
+	for row := 0; row < len(matrix); row++ {
+		for col := 0; col < len(matrix[0]); col++ {
+			coords := newCoord(row, col)
+
+			score := latScenicScore(matrix, coords, row) *
+				lngScenicScore(matrix, coords, col)
+
+			if score > bestScore {
+				bestScore = score
+			}
+		}
+	}
+
+	return bestScore
+}
+
+func getMatrix(r io.Reader) [][]int {
 	scanner := bufio.NewScanner(r)
 
 	var matrix [][]int
@@ -31,24 +71,114 @@ func Part1(r io.Reader) int {
 		row++
 	}
 
-	// fmt.Println(matrix)
+	return matrix
+}
 
-	perimeter := (len(matrix) * 2) + (len(matrix[0]) * 2) - 4
+func latScenicScore(m [][]int, tree coord, rowIdx int) int {
+	treeVal := tree.value(m)
 
-	count := perimeter
+	treeRow := m[rowIdx]
 
-	for row := 1; row < len(matrix)-1; row++ {
-		for col := 1; col < len(matrix[0])-1; col++ {
-			coords := newCoord(row, col)
+	left, right := treeRow[0:tree.y()], treeRow[tree.y()+1:]
 
-			if visibleAlongRow(matrix, coords, row) ||
-				visibleDownColumn(matrix, coords, col) {
-				count++
-			}
+	leftViewingDist := 0
+
+	for i := range left {
+		leftViewingDist++
+
+		idx := tree.y() - 1 - i
+		t := left[idx]
+
+		if t >= treeVal {
+			// can't see beyond this tree
+			break
 		}
 	}
 
-	return count
+	rightViewingDist := 0
+
+	for _, t := range right {
+		rightViewingDist++
+
+		if t >= treeVal {
+			// can't see beyond this tree
+			break
+		}
+	}
+
+	return leftViewingDist * rightViewingDist
+}
+
+func lngScenicScore(m [][]int, tree coord, colIdx int) int {
+	treeVal := tree.value(m)
+
+	treeCol := []int{}
+
+	for _, row := range m {
+		treeCol = append(treeCol, row[colIdx])
+	}
+
+	up, down := treeCol[0:tree.x()], treeCol[tree.x()+1:]
+
+	upperViewingDist := 0
+
+	for i := range up {
+		upperViewingDist++
+
+		idx := tree.x() - 1 - i
+		t := up[idx]
+
+		if t >= treeVal {
+			// can't see beyond this tree
+			break
+		}
+	}
+
+	lowerViewingDst := 0
+
+	for _, t := range down {
+		lowerViewingDst++
+
+		if t >= treeVal {
+			// can't see beyond this tree
+			break
+		}
+	}
+
+	return upperViewingDist * lowerViewingDst
+}
+
+func visibleAlongRow(m [][]int, tree coord, rowIdx int) bool {
+	treeVal := tree.value(m)
+
+	treeRow := m[rowIdx]
+
+	left, right := treeRow[0:tree.y()], treeRow[tree.y()+1:]
+	// fmt.Println("left", left, "right", right)
+
+	var leftObscured bool
+	for _, t := range left {
+		if t >= treeVal {
+			// view obscured to left
+			leftObscured = true
+			break
+		}
+	}
+
+	// if left obscured, we should check the right
+	// if it wasn't that's good enough
+	if !leftObscured {
+		return true
+	}
+
+	for _, t := range right {
+		if t >= treeVal {
+			// view obscured to right
+			return false
+		}
+	}
+
+	return true
 }
 
 func visibleDownColumn(m [][]int, tree coord, colIdx int) bool {
@@ -88,85 +218,20 @@ func visibleDownColumn(m [][]int, tree coord, colIdx int) bool {
 	return true
 }
 
-func visibleAlongRow(m [][]int, tree coord, rowIdx int) bool {
-	treeVal := tree.value(m)
-
-	treeRow := m[rowIdx]
-
-	left, right := treeRow[0:tree.y()], treeRow[tree.y()+1:]
-	// fmt.Println("left", left, "right", right)
-
-	var leftObscured bool
-	for _, t := range left {
-		if t >= treeVal {
-			// view obscured to left
-			leftObscured = true
-			break
-		}
-	}
-
-	// if left obscured, we should check the right
-	// if it wasn't that's good enough
-	if !leftObscured {
-		return true
-	}
-
-	for _, t := range right {
-		if t >= treeVal {
-			// view obscured to right
-			return false
-		}
-	}
-
-	return true
-}
-
-func treeVisible(m [][]int, c coord) bool {
-	tree := c.value(m)
-
-	fmt.Printf("start coord: (%v)\n . up (%v)\n . right (%v)\n . down (%v)\n . left (%v)\n",
-		c, c.up(m), c.right(m), c.down(m), c.left(m),
-	)
-
-	if c.up(m) < tree {
-		return true
-	}
-	if c.right(m) < tree {
-		return true
-	}
-	if c.down(m) < tree {
-		return true
-	}
-	if c.left(m) < tree {
-		return true
-	}
-
-	return false
-}
-
 type coord [2]int
 
 func newCoord(x, y int) coord {
 	return [2]int{x, y}
 }
+
 func (c coord) x() int {
 	return c[0]
 }
+
 func (c coord) y() int {
 	return c[1]
 }
+
 func (c coord) value(m [][]int) int {
 	return m[c.x()][c.y()]
-}
-func (c coord) up(m [][]int) int {
-	return m[c.x()-1][c.y()]
-}
-func (c coord) down(m [][]int) int {
-	return m[c.x()+1][c.y()]
-}
-func (c coord) left(m [][]int) int {
-	return m[c.x()][c.y()-1]
-}
-func (c coord) right(m [][]int) int {
-	return m[c.x()][c.y()+1]
 }
