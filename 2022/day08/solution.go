@@ -19,8 +19,8 @@ func Part1(r io.Reader) int {
 
 		matrix = append(matrix, []int{})
 
-		for _, r := range []rune(line) {
-			num, err := strconv.Atoi(string(r))
+		for _, char := range string(line) {
+			num, err := strconv.Atoi(string(char))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -31,7 +31,7 @@ func Part1(r io.Reader) int {
 		row++
 	}
 
-	fmt.Println(matrix)
+	// fmt.Println(matrix)
 
 	perimeter := (len(matrix) * 2) + (len(matrix[0]) * 2) - 4
 
@@ -40,7 +40,9 @@ func Part1(r io.Reader) int {
 	for row := 1; row < len(matrix)-1; row++ {
 		for col := 1; col < len(matrix[0])-1; col++ {
 			coords := newCoord(row, col)
-			if treeVisible(matrix, coords) {
+
+			if visibleAlongRow(matrix, coords, row) ||
+				visibleDownColumn(matrix, coords, col) {
 				count++
 			}
 		}
@@ -49,28 +51,93 @@ func Part1(r io.Reader) int {
 	return count
 }
 
-// visible right recursively (base: col == outer)
-// visible left recursively (base: col == 0)
-// visible up recursively (base: row == 0)
-// visible down recursively (base: row == outer)
+func visibleDownColumn(m [][]int, tree coord, colIdx int) bool {
+	treeVal := tree.value(m)
 
-func treeVisible(matrix [][]int, c coord) bool {
-	tree := c.value(matrix)
+	treeCol := []int{}
+
+	for _, row := range m {
+		treeCol = append(treeCol, row[colIdx])
+	}
+
+	up, down := treeCol[0:tree.x()], treeCol[tree.x()+1:]
+
+	// fmt.Println("up", up, "down", down)
+
+	var topObscured bool
+	for _, t := range up {
+		if t >= treeVal {
+			// view obscured above
+			topObscured = true
+			break
+		}
+	}
+
+	// if top obscured, check bottom
+	if !topObscured {
+		return true
+	}
+
+	for _, t := range down {
+		if t >= treeVal {
+			// view obscured to below
+			return false
+		}
+	}
+
+	return true
+}
+
+func visibleAlongRow(m [][]int, tree coord, rowIdx int) bool {
+	treeVal := tree.value(m)
+
+	treeRow := m[rowIdx]
+
+	left, right := treeRow[0:tree.y()], treeRow[tree.y()+1:]
+	// fmt.Println("left", left, "right", right)
+
+	var leftObscured bool
+	for _, t := range left {
+		if t >= treeVal {
+			// view obscured to left
+			leftObscured = true
+			break
+		}
+	}
+
+	// if left obscured, we should check the right
+	// if it wasn't that's good enough
+	if !leftObscured {
+		return true
+	}
+
+	for _, t := range right {
+		if t >= treeVal {
+			// view obscured to right
+			return false
+		}
+	}
+
+	return true
+}
+
+func treeVisible(m [][]int, c coord) bool {
+	tree := c.value(m)
 
 	fmt.Printf("start coord: (%v)\n . up (%v)\n . right (%v)\n . down (%v)\n . left (%v)\n",
-		coord, row-1, col, row, col+1, row+1, col, row, col-1,
+		c, c.up(m), c.right(m), c.down(m), c.left(m),
 	)
 
-	if matrix[row-1][col] < tree {
+	if c.up(m) < tree {
 		return true
 	}
-	if matrix[row][col+1] < tree {
+	if c.right(m) < tree {
 		return true
 	}
-	if matrix[row+1][col] < tree {
+	if c.down(m) < tree {
 		return true
 	}
-	if matrix[row][col-1] < tree {
+	if c.left(m) < tree {
 		return true
 	}
 

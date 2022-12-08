@@ -2,6 +2,7 @@ package day08
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	_ "embed"
@@ -21,5 +22,5 @@ func TestPart1(t *testing.T) {
 		t.Errorf("got %d, want %d", ans, expected)
 	}
 
-	// fmt.Println(Part1(bytes.NewReader(input)))
+	fmt.Println(Part1(bytes.NewReader(input)))
 }
