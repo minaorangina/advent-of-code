@@ -65,8 +65,8 @@ type step struct {
 }
 
 type matrix struct {
-	grid  [][]string
-	start coord
+	grid              [][]string
+	start, head, tail coord
 }
 
 func newMatrix(lengthX, lengthY int) matrix {
@@ -87,7 +87,12 @@ func newMatrix(lengthX, lengthY int) matrix {
 
 func (m matrix) setStart(c coord) {
 	m.start = c
-	m.grid[c.y()][c.x()] = "s"
+	m.head = c
+	m.tail = c
+
+	m.grid[m.start.y()][m.start.x()] = "s"
+	m.grid[m.tail.y()][m.tail.x()] = "T"
+	m.grid[m.head.y()][m.head.x()] = "H"
 }
 
 func (m matrix) String() string {
