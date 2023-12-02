@@ -46,39 +46,58 @@ def part2():
     }
 
     with open(filepath, 'r') as reader:
-        line = reader.readline()
+        line = reader.readline() #two1nine
 
-        num = ''
+        all_nums = []
 
-        for c in line:
-            try:
-                int(float(c))
-                num = num + int(float(c))
-            except:
-                found = find_word(line, 0, known_numbers)
-                if len(found) == 1:
-                    # map string num to actual num
-                    for k, v in found.items():
-                        num = num + v
-                        break
-                    print(num)
-                    break
+        c_idx = 0
+        while line != '':
+            digits = []
+            num = ''
+            while c_idx < len(line):
+                c = line[c_idx]
+                try:
+                    int(float(c))
+                    digits.append(c)
+                except:
+                    # print("looking in %s for %s @ %d"%(line[c_idx:],c, 0))
+                    found = find_word(line[c_idx:], 0, known_numbers)
+                    if found != '':
+                        print("we found one!!!", found)
+                        # map string num to actual num
+                        digits.append(known_numbers[found])
+                        print("collected thus far", digits)
+                c_idx += 1
+
+            if len(digits) != 0:
+                print("num",num, digits)
+                num += digits[0]
+                num += digits[-1]
+                all_nums.append(num)
+                print(all_nums)
+                line = reader.readline()
+
+        print(all_nums)
 
 
 def find_word(line: str, i: int, words: Dict[str, str]):
-    print(i, words, line)
-    if len(words) < 2:
-         return words
+    if len(words) == 0:
+         return ''
+    # print(">>>looking for "+line[i], i, words, line)
     if i >= len(line):
         # we've overshot it
-        return {}
+        return ''
 
     fewer_words = {}
     # smallify dict
     for word in words.keys():
+         if i >= len(word):
+            print("returning with", word)
+            return word
          if line[i] == word[i]:
               fewer_words[word] = words[word]
 
+    # print('we keep looking')
     return find_word(line, i+1, fewer_words)
 
 
