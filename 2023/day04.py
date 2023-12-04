@@ -1,6 +1,3 @@
-import re
-
-
 def part1(filepath):
     with open(filepath, "r") as reader:
         line = reader.readline()
@@ -10,19 +7,16 @@ def part1(filepath):
             card_nums = line.split(":")[1]
             halves = [x.strip() for x in card_nums.split("|")]
 
-            winning = halves[0].split()
-            have = halves[1].split()
+            winning = set(halves[0].split())
+            have = set(halves[1].split())
 
-            points = 0
+            inters = winning.intersection(have)
 
-            for w in winning:
-                if w in have:
-                    if points == 0:
-                        points = 1
-                    else:
-                        points *= 2
+            matches = len(inters)
 
-            sum += points
+            if matches > 0:
+                sum += pow(2, matches-1)
+
             line = reader.readline()
 
         return sum
