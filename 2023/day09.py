@@ -10,24 +10,20 @@ with open(filepath, "r") as reader:
 
 
 def do(nums, idx):
-    n = 0
     if len(set(nums)) == 1 and nums[0] == 0:
         return nums[idx]
 
     diff = np.diff(nums)
-    n = diff[idx]
 
     rtn = do(diff, idx)
     return rtn + nums[idx]
 
 
 def do2(nums, idx):
-    n = 0
     if len(set(nums)) == 1 and nums[0] == 0:
         return nums[idx]
 
     diff = np.diff(nums)
-    n = diff[idx]
 
     rtn = do2(diff, idx)
     return nums[idx] - rtn
