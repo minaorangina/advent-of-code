@@ -9,23 +9,45 @@ with open(filepath, "r") as reader:
         file[i] = [int(float(x)) for x in file[i].split()]
 
 
-def do(nums):
+def do(nums, idx):
     n = 0
     if len(set(nums)) == 1 and nums[0] == 0:
-        return nums[-1] 
-    
-    diff = np.diff(nums)
-    n = diff[-1]
+        return nums[idx]
 
-    return do(diff) + nums[-1]
+    diff = np.diff(nums)
+    n = diff[idx]
+
+    rtn = do(diff, idx)
+    return rtn + nums[idx]
+
+
+def do2(nums, idx):
+    n = 0
+    if len(set(nums)) == 1 and nums[0] == 0:
+        return nums[idx]
+
+    diff = np.diff(nums)
+    n = diff[idx]
+
+    rtn = do2(diff, idx)
+    return nums[idx] - rtn
 
 
 def part1(file):
     sum = 0
     for row in file:
-        sum += do(row)
+        sum += do(row, -1)
+
+    print(sum)
+
+
+def part2(file):
+    sum = 0
+    for row in file:
+        sum += do2(row, 0)
 
     print(sum)
 
 
 part1(file)
+part2(file)
