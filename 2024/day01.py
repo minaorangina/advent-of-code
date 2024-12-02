@@ -1,5 +1,5 @@
 
-def day01(lines):
+def day01_1(lines):
     left = []
     right = []
     total = 0
@@ -17,7 +17,7 @@ def day01(lines):
 
     return total
 
-def day02(lines):
+def day01_2(lines):
     left = []
     right_count = {}
     total = 0
