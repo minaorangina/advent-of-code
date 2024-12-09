@@ -44,10 +44,10 @@ def write_grid(grid):
 def update_grid(grid, loc):
     loc_r, loc_c = loc[0],loc[1]
 
-    char = "#"
-    if not loc_available(grid, loc):
-        # occupied by an antenna
-        char = grid[loc_r][loc_c]
+    char = "?"
+    # if not loc_available(grid, loc):
+    #     # occupied by an antenna
+    #     char = grid[loc_r][loc_c]
 
     new_row = grid[loc_r]
     new_row = new_row[0:loc_c] + char + new_row[loc_c+1:]
@@ -93,6 +93,9 @@ def part2(path):
         for origin_loc in locations:
             for match_loc in locations:
                 if match_loc == origin_loc:
+                    if len(locations) > 0:
+                        antinodes.add(origin_loc)
+
                     continue
                 print(f"for char {char} @ {origin_loc}, match at {match_loc}")
                 do2(grid, origin_loc, match_loc, max_row, max_col, antinodes, 1)
@@ -133,4 +136,4 @@ def part1(path):
 
 
 # print(part1("input/day08_example.txt"))
-print(part2("input/day08_example.txt"))
+print(part2("input/day08.txt"))

@@ -65,18 +65,24 @@ def part1(grid):
             continue
         else:
             position = next_pos
-    return len(visited)
+    return visited
 
-def part2(grid):
+def do_path(grid, visited):
     position, guard = find_guard(grid)
-    visited = set()
+
     while valid(position):
         r, c = get_row_col(position)
-        visited.add(f"{r},{c}")
+        visited.add(f"{r},{c},{guard}")
+        print(visited)
         # am i at the end?
         next_pos = get_next_position(position, guard)
         if not valid(next_pos):
-            break
+            # I am on the end
+            return False
+        
+        here = f"{r},{c},{guard}"
+        if here in visited:
+            return True
         
         # can i progress?
         r, c = get_row_col(next_pos)
@@ -87,9 +93,19 @@ def part2(grid):
             continue
         else:
             position = next_pos
-    return len(visited)
+
+def part2(grid, visited):
+    count = 0
+    for r in grid:
+        for sq in r:
+            if sq != "#" and sq not in next_guards.keys():
+                repeats = do_path(grid, visited)
+                if repeats:
+                    count += 1
+    return count
+        
     
-grid = parse("input/day06.txt")
+grid = parse("input/day06_example.txt")
 max_row_len = len(grid[0])
 max_col_len = len(grid)
 next_guards = {
@@ -99,4 +115,7 @@ next_guards = {
     "<":"^",
 }
 
-print(part1(grid))
+visited = part1(grid)
+print(len(visited))
+#print(part2(grid, visited))
+print(do_path())

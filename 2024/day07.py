@@ -2,6 +2,8 @@ def multiply(x,y):
     return x * y
 def add(x,y):
     return x+y
+def concatenate(x,y):
+    return int(str(x)+str(y))
 
 with open("input/day07.txt", "r") as reader:
     lines = reader.readlines()
@@ -10,8 +12,8 @@ with open("input/day07.txt", "r") as reader:
     lines = [[l.strip(":") for l in y] for y in lines]
     lines = [[int(l) for l in x] for x in lines]
 
-    # ops_str = "*+"
-    ops = [multiply, add]
+    # ops_str = "*+|"
+    ops = [multiply, add, concatenate]
     from itertools import product
 
     total = 0
@@ -21,6 +23,7 @@ with open("input/day07.txt", "r") as reader:
         end_idx = len(seq)-1
         runs = list(product(ops, repeat = end_idx))
         # runs_str = list(product(ops_str, repeat = end_idx))
+        print
         match_found = False
 
         for r in runs:
