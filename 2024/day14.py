@@ -67,3 +67,26 @@ with open("input/day14.txt", "r") as reader:
     
     print(upper_l, upper_r, bottom_l, bottom_r)
     print(upper_l * upper_r * bottom_l * bottom_r)
+
+    # part 2
+    for i in range(0,10000):
+        s = [['_' for i in range(max_col)] for i in range(max_row)]
+        for line in lines:
+            # get position
+            position = [int(x) for x in (re.findall(r"(?<=p=)\d+,\d+", line)[0].split(","))]
+
+            # get velocity
+            vel = [int(x) for x in (re.findall(r"(?<=v=)-?\d+,-?\d+", line)[0].split(","))]
+            
+            robot = Coords(position[1], position[0])
+            velocity = Coords(vel[1], vel[0])
+
+            end = robot + (velocity * i)
+            
+            s[end.r][end.c] = '#'
+        
+        print(i)
+        s = ["".join(i) for i in s]
+        for i in s:
+            print("".join(i))
+        # not 52 or 27
